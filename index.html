@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vaultly — Withdraw funds, on your schedule</title>
+<meta name="description" content="Vaultly is a modern withdrawal product: move funds from your balance to CashApp, PayPal, Chime, Zelle, BTC or your local bank in a few focused steps.">
+<meta name="theme-color" content="#04080c">
+<meta name="color-scheme" content="dark">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%2312c282'/><path d='M12 20s6-3 6-7.5V7l-6-2.3L6 7v5.5C6 17 12 20 12 20Z' fill='none' stroke='%2304140d' stroke-width='1.9' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <span class="bg__orb bg__orb--a"></span>
+  <span class="bg__orb bg__orb--b"></span>
+</div>
+
+<div class="shell">
+
+  <!-- ================= header ================= -->
+  <header class="hdr">
+    <div class="hdr__in">
+      <a class="brand" href="#" data-go="home">
+        <span class="brand__mark" data-icon="shieldCheck"></span>
+        <span>Vaultly</span>
+      </a>
+      <span class="hdr__spacer"></span>
+
+      <!-- signed-in chip -->
+      <div class="who" id="who" hidden>
+        <span class="who__av" id="who-av">V</span>
+        <span class="who__tx" id="who-name">—</span>
+      </div>
+      <button type="button" class="btn btn--quiet btn--sm" id="btn-logout-top" hidden>
+        <span data-icon="logout"></span>
+        <span class="btn__label">Log out</span>
+      </button>
+      <button type="button" class="btn btn--ghost btn--sm" id="btn-signin-top" hidden>
+        <span class="btn__label">Sign in</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+  <!-- ==================================================================
+       SCREEN: AUTH  (marketing pitch + real auth card)
+       ================================================================== -->
+  <section class="screen is-on" id="scr-auth" aria-labelledby="auth-h">
+    <div class="auth">
+
+      <!-- left: pitch -->
+      <div class="pitch">
+        <span class="eyebrow"><span class="eyebrow__dot"></span> Bank-grade sessions, live backend</span>
+
+        <h1>Move your money <em>where you want it.</em></h1>
+        <p class="lede">
+          Vaultly is a withdrawal product built around one focused step at a time.
+          Send funds to CashApp, PayPal, Chime, Zelle, BTC or your local bank —
+          with clear fees, real limits and a receipt for every request.
+        </p>
+
+        <figure class="visual">
+          <img src="assets/hero-vault.jpg" alt="A translucent glass vault cube glowing emerald, surrounded by floating crystal shards" width="1200" height="654" fetchpriority="high">
+          <figcaption class="visual__cap">
+            <span data-icon="lock"></span> Encrypted in transit and at rest
+          </figcaption>
+        </figure>
+
+        <div class="trust">
+          <span class="trust__item"><span data-icon="shieldCheck"></span> Salted password hashing</span>
+          <span class="trust__item"><span data-icon="fingerprint"></span> Server-side sessions</span>
+          <span class="trust__item"><span data-icon="bolt"></span> Instant quotes</span>
+          <span class="trust__item"><span data-icon="receipt"></span> Reference per withdrawal</span>
+        </div>
+      </div>
+
+      <!-- right: auth card -->
+      <div class="auth__card-wrap">
+        <div class="card auth__card">
+
+          <div class="seg" role="tablist" aria-label="Account access">
+            <button type="button" class="seg__btn" role="tab" id="tab-signup" aria-selected="true" aria-controls="form-signup" data-tab="signup">Create account</button>
+            <button type="button" class="seg__btn" role="tab" id="tab-login" aria-selected="false" aria-controls="form-login" data-tab="login">Log in</button>
+          </div>
+
+          <!-- alert -->
+          <div class="alert" id="auth-alert" role="alert">
+            <span data-icon="alert"></span><span id="auth-alert-tx"></span>
+          </div>
+
+          <!-- ---------- sign up ---------- -->
+          <form id="form-signup" novalidate autocomplete="on">
+            <div class="auth__hd">
+              <h2 id="auth-h">Create your account</h2>
+              <p>Your account lives on the server, so it works on every device.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="su-name">
+                <span>Account name</span>
+                <span class="field__hint" id="su-name-hint">filled from your email</span>
+              </label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="user"></span>
+                <input class="input" id="su-name" name="name" type="text" autocomplete="name"
+                       placeholder="e.g. Jane Doe" maxlength="60" spellcheck="false">
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="su-email"><span>Email</span></label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="mail"></span>
+                <input class="input" id="su-email" name="email" type="email" inputmode="email"
+                       autocomplete="email" placeholder="you@example.com" required
+                       aria-describedby="su-email-err">
+              </div>
+              <p class="err" id="su-email-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="su-pass">
+                <span>Password</span><span class="field__hint" id="su-pass-hint">5 character minimum</span>
+              </label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="lock"></span>
+                <input class="input" id="su-pass" name="password" type="password"
+                       autocomplete="new-password" placeholder="Create a password" required
+                       aria-describedby="su-pass-err">
+                <button type="button" class="peek" data-peek="su-pass" aria-label="Show password">
+                  <span data-icon="eye"></span>
+                </button>
+              </div>
+              <div class="strength" aria-hidden="true">
+                <span class="strength__seg"></span><span class="strength__seg"></span>
+                <span class="strength__seg"></span><span class="strength__seg"></span>
+              </div>
+              <p class="strength__txt" id="su-strength">Use 5+ characters. Longer is stronger.</p>
+              <p class="err" id="su-pass-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="su-confirm"><span>Confirm password</span></label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="lock"></span>
+                <input class="input" id="su-confirm" name="confirm" type="password"
+                       autocomplete="new-password" placeholder="Repeat your password" required
+                       aria-describedby="su-confirm-err">
+                <button type="button" class="peek" data-peek="su-confirm" aria-label="Show password">
+                  <span data-icon="eye"></span>
+                </button>
+              </div>
+              <p class="err" id="su-confirm-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="su-submit">
+              <span class="btn__spin"></span>
+              <span class="btn__label">Create account</span>
+              <span data-icon="arrowRight"></span>
+            </button>
+
+            <p class="auth__foot">
+              Already have an account?
+              <button type="button" data-tab-jump="login">Log in instead</button>
+            </p>
+          </form>
+
+          <!-- ---------- log in ---------- -->
+          <form id="form-login" novalidate autocomplete="on" hidden>
+            <div class="auth__hd">
+              <h2>Welcome back</h2>
+              <p>Log in with the email and password you signed up with.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="li-email"><span>Email</span></label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="mail"></span>
+                <input class="input" id="li-email" name="email" type="email" inputmode="email"
+                       autocomplete="email" placeholder="you@example.com" required
+                       aria-describedby="li-email-err">
+              </div>
+              <p class="err" id="li-email-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <div class="field">
+              <label class="field__lbl" for="li-pass"><span>Password</span></label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="lock"></span>
+                <input class="input" id="li-pass" name="password" type="password"
+                       autocomplete="current-password" placeholder="Your password" required
+                       aria-describedby="li-pass-err">
+                <button type="button" class="peek" data-peek="li-pass" aria-label="Show password">
+                  <span data-icon="eye"></span>
+                </button>
+              </div>
+              <p class="err" id="li-pass-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="li-submit">
+              <span class="btn__spin"></span>
+              <span class="btn__label">Log in</span>
+              <span data-icon="arrowRight"></span>
+            </button>
+
+            <p class="auth__foot">
+              New to Vaultly?
+              <button type="button" data-tab-jump="signup">Create an account</button>
+            </p>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       SCREEN: DASHBOARD
+       ================================================================== -->
+  <section class="screen" id="scr-dash" aria-labelledby="dash-h">
+    <div class="app">
+
+      <ol class="steps" id="steps" aria-label="Withdrawal progress">
+        <li class="step is-now" data-step="0"><span class="step__n">1</span> Overview</li>
+        <span class="step__bar"></span>
+        <li class="step" data-step="1"><span class="step__n">2</span> Amount</li>
+        <span class="step__bar"></span>
+        <li class="step" data-step="2"><span class="step__n">3</span> Method</li>
+        <span class="step__bar"></span>
+        <li class="step" data-step="3"><span class="step__n">4</span> Review</li>
+        <span class="step__bar"></span>
+        <li class="step" data-step="4"><span class="step__n">5</span> Done</li>
+      </ol>
+
+      <div class="split">
+        <div>
+          <div class="bal">
+            <div class="bal__lbl"><span data-icon="wallet"></span> Available funds</div>
+            <div class="bal__amt" id="bal-funds">$0.00</div>
+            <div class="bal__meta">
+              <span data-icon="shieldCheck"></span>
+              Withdraw up to <strong id="bal-limit">$0.00</strong> per your available limit
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__k">Available limit</div>
+              <div class="stat__v" id="stat-limit">$0.00</div>
+            </div>
+            <div class="stat">
+              <div class="stat__k">Withdrawn</div>
+              <div class="stat__v" id="stat-used">$0.00</div>
+            </div>
+            <div class="stat">
+              <div class="stat__k">Fee</div>
+              <div class="stat__v stat__v--em" id="stat-fee">1.00%</div>
+            </div>
+          </div>
+
+          <div class="card panel mt-3">
+            <div class="panel__hd">
+              <div class="panel__kick">Recent activity</div>
+              <h2 id="dash-h">Your withdrawals</h2>
+              <p>Every request is recorded server-side against your account.</p>
+            </div>
+            <div class="hist" id="hist">
+              <div class="empty"><span data-icon="receipt"></span>No withdrawals yet — start your first one.</div>
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card panel">
+            <div class="panel__hd">
+              <div class="panel__kick">Step 1 of 5</div>
+              <h2>Start a withdrawal</h2>
+              <p>Move funds from your balance to the account of your choice.</p>
+            </div>
+
+            <div class="rows mb-2">
+              <div class="row">
+                <span class="row__k"><span data-icon="banknote"></span> Available funds</span>
+                <span class="row__v" id="side-funds">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="shieldCheck"></span> Withdrawal limit</span>
+                <span class="row__v" id="side-limit">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="percent"></span> Processing fee</span>
+                <span class="row__v" id="side-fee">1.00% · $1.00 min</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn--primary btn--full btn--lg" id="btn-start">
+              <span class="btn__label">Withdraw funds</span>
+              <span data-icon="arrowRight"></span>
+            </button>
+
+            <div class="note mt-3">
+              <span data-icon="info"></span>
+              <span>You can withdraw up to your available limit. The fee is deducted from the amount you send.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       SCREEN: AMOUNT
+       ================================================================== -->
+  <section class="screen" id="scr-amount" aria-labelledby="amt-h">
+    <div class="app">
+      <div class="split--even split">
+        <div class="card panel">
+          <div class="panel__hd">
+            <div class="panel__kick">Step 2 of 5</div>
+            <h2 id="amt-h">How much do you want to withdraw?</h2>
+            <p>Enter an amount up to your available limit.</p>
+          </div>
+
+          <div class="alert" id="amt-alert" role="alert">
+            <span data-icon="alert"></span><span id="amt-alert-tx"></span>
+          </div>
+
+          <form id="form-amount" novalidate>
+            <div class="field">
+              <label class="field__lbl" for="amt-input">
+                <span>Amount (USD)</span>
+                <span class="field__hint" id="amt-min-hint">$10.00 minimum</span>
+              </label>
+              <div class="input-wrap">
+                <input class="input input--amount" id="amt-input" name="amount" type="text"
+                       inputmode="decimal" autocomplete="off" placeholder="0.00"
+                       aria-describedby="amt-err">
+              </div>
+              <p class="err" id="amt-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <div class="chips" id="amt-chips">
+              <button type="button" class="chip" data-amt="100">$100</button>
+              <button type="button" class="chip" data-amt="250">$250</button>
+              <button type="button" class="chip" data-amt="500">$500</button>
+              <button type="button" class="chip" data-amt="1000">$1,000</button>
+              <button type="button" class="chip" data-amt="max">Max limit</button>
+            </div>
+
+            <div class="note">
+              <span data-icon="info"></span>
+              <span>A <strong>1.00%</strong> processing fee applies, with a <strong>$1.00</strong> minimum. The fee is taken out of the amount you withdraw.</span>
+            </div>
+
+            <div class="navrow">
+              <button type="button" class="btn btn--ghost" data-back="dash">
+                <span data-icon="arrowLeft"></span><span class="btn__label">Back</span>
+              </button>
+              <button type="submit" class="btn btn--primary" id="amt-next">
+                <span class="btn__spin"></span><span class="btn__label">Continue</span><span data-icon="arrowRight"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <aside>
+          <div class="card panel">
+            <div class="panel__kick">Live quote</div>
+            <div class="rows">
+              <div class="row">
+                <span class="row__k"><span data-icon="coins"></span> You withdraw</span>
+                <span class="row__v" id="q-amount">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="percent"></span> Processing fee</span>
+                <span class="row__v" id="q-fee">$0.00</span>
+              </div>
+              <div class="row row--total">
+                <span class="row__k">You receive</span>
+                <span class="row__v" id="q-net">$0.00</span>
+              </div>
+            </div>
+            <div class="note mt-3">
+              <span data-icon="shieldCheck"></span>
+              <span>Quotes are calculated on the server from your live balance, so what you see is what you get.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       SCREEN: METHOD
+       ================================================================== -->
+  <section class="screen" id="scr-method" aria-labelledby="mth-h">
+    <div class="app">
+      <div class="split--even split">
+        <div class="card panel">
+          <div class="panel__hd">
+            <div class="panel__kick">Step 3 of 5</div>
+            <h2 id="mth-h">Choose a withdrawal method</h2>
+            <p>Pick where you would like the funds delivered.</p>
+          </div>
+
+          <div class="alert" id="mth-alert" role="alert">
+            <span data-icon="alert"></span><span id="mth-alert-tx"></span>
+          </div>
+
+          <form id="form-method" novalidate>
+            <div class="methods" id="methods" role="radiogroup" aria-label="Withdrawal method"></div>
+
+            <div class="field">
+              <label class="field__lbl" for="dest-input">
+                <span id="dest-label">Destination</span>
+                <span class="field__hint" id="dest-eta"></span>
+              </label>
+              <div class="input-wrap input-wrap--icon">
+                <span data-icon="at"></span>
+                <input class="input" id="dest-input" name="destination" type="text"
+                       autocomplete="off" spellcheck="false" placeholder="Choose a method first"
+                       aria-describedby="dest-err dest-hint">
+              </div>
+              <p class="dest-hint" id="dest-hint"><span data-icon="info"></span><span id="dest-hint-tx">Pick a method to see the expected format.</span></p>
+              <p class="err" id="dest-err"><span data-icon="alert"></span><span class="err__tx"></span></p>
+            </div>
+
+            <div class="navrow">
+              <button type="button" class="btn btn--ghost" data-back="amount">
+                <span data-icon="arrowLeft"></span><span class="btn__label">Back</span>
+              </button>
+              <button type="submit" class="btn btn--primary" id="mth-next">
+                <span class="btn__spin"></span><span class="btn__label">Review</span><span data-icon="arrowRight"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <aside>
+          <div class="card panel">
+            <div class="panel__kick">So far</div>
+            <div class="rows">
+              <div class="row">
+                <span class="row__k"><span data-icon="coins"></span> Amount</span>
+                <span class="row__v" id="m-amount">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="percent"></span> Fee</span>
+                <span class="row__v" id="m-fee">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="banknote"></span> You receive</span>
+                <span class="row__v" id="m-net">$0.00</span>
+              </div>
+            </div>
+            <div class="note note--warn mt-3">
+              <span data-icon="alert"></span>
+              <span>Double-check the destination — funds sent to a wrong handle or wallet address cannot be recovered.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       SCREEN: REVIEW
+       ================================================================== -->
+  <section class="screen" id="scr-review" aria-labelledby="rev-h">
+    <div class="app">
+      <div class="split--even split">
+        <div class="card panel">
+          <div class="panel__hd">
+            <div class="panel__kick">Step 4 of 5</div>
+            <h2 id="rev-h">Review and confirm</h2>
+            <p>Check the details below, then confirm your withdrawal.</p>
+          </div>
+
+          <div class="alert" id="rev-alert" role="alert">
+            <span data-icon="alert"></span><span id="rev-alert-tx"></span>
+          </div>
+
+          <div class="rows">
+            <div class="row">
+              <span class="row__k"><span data-icon="coins"></span> Amount</span>
+              <span class="row__v" id="r-amount">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k"><span data-icon="percent"></span> Processing fee</span>
+              <span class="row__v" id="r-fee">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k"><span data-icon="banknote"></span> You receive</span>
+              <span class="row__v" id="r-net">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k"><span data-icon="wallet"></span> Method</span>
+              <span class="row__v" id="r-method">—</span>
+            </div>
+            <div class="row">
+              <span class="row__k"><span data-icon="at"></span> Destination</span>
+              <span class="row__v" id="r-dest">—</span>
+            </div>
+            <div class="row">
+              <span class="row__k"><span data-icon="clock"></span> Estimated arrival</span>
+              <span class="row__v" id="r-eta">—</span>
+            </div>
+            <div class="row row--total">
+              <span class="row__k">Total debited</span>
+              <span class="row__v" id="r-total">$0.00</span>
+            </div>
+          </div>
+
+          <div class="navrow">
+            <button type="button" class="btn btn--ghost" data-back="method">
+              <span data-icon="arrowLeft"></span><span class="btn__label">Back</span>
+            </button>
+            <button type="button" class="btn btn--primary" id="rev-confirm">
+              <span class="btn__spin"></span><span class="btn__label">Confirm withdrawal</span><span data-icon="check"></span>
+            </button>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card panel">
+            <div class="panel__kick">Before you confirm</div>
+            <div class="note">
+              <span data-icon="shieldCheck"></span>
+              <span>Your session is verified server-side. The reference number is generated on our server and written to your account history — it is not a client-side claim.</span>
+            </div>
+            <div class="note note--warn mt-3">
+              <span data-icon="alert"></span>
+              <span>Withdrawals are <strong>final</strong> once confirmed. Verify the destination handle or wallet address.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       SCREEN: RECEIPT
+       ================================================================== -->
+  <section class="screen" id="scr-done" aria-labelledby="done-h">
+    <div class="app">
+      <div class="split--even split">
+        <div class="card receipt">
+          <div class="receipt__badge"><span data-icon="check"></span></div>
+          <h2 id="done-h">Withdrawal requested</h2>
+          <p>Your request is being processed. Keep the reference handy.</p>
+
+          <div class="receipt__ref">
+            <span data-icon="hash"></span><span id="d-ref">—</span>
+          </div>
+
+          <div class="rows">
+            <div class="row">
+              <span class="row__k">Amount</span><span class="row__v" id="d-amount">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k">Fee</span><span class="row__v" id="d-fee">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k">You receive</span><span class="row__v" id="d-net">$0.00</span>
+            </div>
+            <div class="row">
+              <span class="row__k">Method</span><span class="row__v" id="d-method">—</span>
+            </div>
+            <div class="row">
+              <span class="row__k">Destination</span><span class="row__v" id="d-dest">—</span>
+            </div>
+            <div class="row">
+              <span class="row__k">Status</span>
+              <span class="row__v"><span class="pill" id="d-status">pending</span></span>
+            </div>
+          </div>
+
+          <div class="receipt__actions">
+            <button type="button" class="btn btn--ghost" id="d-copy">
+              <span data-icon="copy"></span><span class="btn__label">Copy reference</span>
+            </button>
+            <button type="button" class="btn btn--primary" id="d-again">
+              <span data-icon="refresh"></span><span class="btn__label">Make another withdrawal</span>
+            </button>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card panel">
+            <div class="panel__kick">Updated balances</div>
+            <div class="rows">
+              <div class="row">
+                <span class="row__k"><span data-icon="wallet"></span> Available funds</span>
+                <span class="row__v" id="d-funds">$0.00</span>
+              </div>
+              <div class="row">
+                <span class="row__k"><span data-icon="shieldCheck"></span> Available limit</span>
+                <span class="row__v" id="d-limit">$0.00</span>
+              </div>
+            </div>
+            <div class="note mt-3">
+              <span data-icon="info"></span>
+              <span>This request now appears in your account history and is visible from any device you log in on.</span>
+            </div>
+            <button type="button" class="btn btn--ghost btn--full mt-3" id="d-dash">
+              <span data-icon="arrowLeft"></span><span class="btn__label">Back to overview</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- ================= footer ================= -->
+  <footer class="ftr">
+    <span class="ftr__live">Live backend</span> ·
+    accounts, sessions and withdrawals are stored server-side (SQLite) with salted password hashing.
+  </footer>
+</div>
+
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

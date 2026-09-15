@@ -1,0 +1,12 @@
+# never commit the database or its WAL sidecars
+data/
+*.db
+*.db-wal
+*.db-shm
+
+__pycache__/
+*.pyc
+
+qa/
+*.log
+logs/

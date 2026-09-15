@@ -1,0 +1,27 @@
+# Render blueprint — one-click deploy with a persistent disk so the
+# SQLite database (i.e. the user accounts) survives restarts and redeploys.
+#
+# Deploy:  Render Dashboard -> New -> Blueprint -> pick this repo.
+# Render reads this file, builds ./Dockerfile and mounts the disk below.
+services:
+  - type: web
+    name: withdrawal-wireframe
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # NOTE: a persistent disk is not available on the free plan.
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      # Do NOT hardcode PORT here. Render injects its own PORT env var and
+      # expects the service to bind to it; server.py reads os.environ["PORT"].
+      - key: HOST
+        value: 0.0.0.0
+      # Point the database at the mounted disk so accounts survive redeploys.
+      - key: DB_PATH
+        value: /app/data/app.db
+    # Without this disk, every redeploy would start from an empty database
+    # and all existing accounts would disappear.
+    disk:
+      name: wf-data
+      mountPath: /app/data
+      sizeGB: 1

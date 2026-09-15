@@ -1,0 +1,14 @@
+# Never bake runtime state or local junk into the image.
+# The live database lives on the mounted persistent disk at /app/data,
+# not inside the image.
+data/
+logs/
+qa/
+__pycache__/
+*.pyc
+*.log
+*.db
+*.db-wal
+*.db-shm
+.git/
+.gitignore
